@@ -1,0 +1,20 @@
+{
+  "name": "@dimitrk/libphonenumber",
+  "version": "1.0.0",
+  "description": "Googles libphonenumber library build for node ",
+  "main": "./javascript/lib/compiled.js",
+  "scripts": {
+    "build": "ant -f javascript/build.xml compile-lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DimitrK/libphonenumber.git"
+  },
+  "author": "DimitrK",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DimitrK/libphonenumber/issues"
+  },
+  "homepage": "https://github.com/DimitrK/libphonenumber#readme"
+}

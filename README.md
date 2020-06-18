@@ -10,7 +10,7 @@ running on smartphones, and is used by the Android framework since 4.0 (Ice
 Cream Sandwich).
 
 # Quick links
-
+*   Updating from official repo, building and publishing. [See guide](UPDATING-AND-BUILDING.md)
 *   **Reporting an issue?** Want to send a pull request? See the [contribution
     guidelines](CONTRIBUTING.md)
 *   Check the [frequently asked questions](FAQ.md)

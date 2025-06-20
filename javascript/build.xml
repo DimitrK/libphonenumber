@@ -4,7 +4,7 @@
   <property name="closure-compiler.dir"
             value="${basedir}/../../closure-compiler" />
   <property name="closure-compiler.jar"
-            value="${closure-compiler.dir}/bazel-bin/compiler_unshaded_deploy.jar" />
+            value="${closure-compiler.dir}/target/closure-compiler-1.0-SNAPSHOT.jar" />
   <property name="closure-library.dir"
             value="${basedir}/../../closure-library" />
   <property name="closure-linter.dir"
@@ -13,49 +13,45 @@
             value="${basedir}/../../python-gflags" />
 
   <macrodef name="closure-compile">
-    <attribute name="entrypoint" />
+    <attribute name="inputfile" />
     <attribute name="outputfile" />
-    <attribute name="compilationlevel" default="ADVANCED_OPTIMIZATIONS" />
-    <attribute name="outputwrapper" default="(function(){%output%})();" />
+    <attribute name="compilationlevel" default="SIMPLE_OPTIMIZATIONS" />
+    <attribute name="outputmode" default="compiled" />
+    <attribute name="outputwrapper" default="%output% module.exports=module$index.default;" />
     <element name="extraflags" optional="yes" />
     <sequential>
       <exec executable="java" failonerror="true" logError="true">
         <arg value="-jar" />
         <arg value="${closure-compiler.jar}" />
-        <arg line='--entry_point="@{entrypoint}"' />
-        <arg line='--js_output_file="@{outputfile}"' />
-        <arg line='--js="${closure-library.dir}/closure/goog/**.js"' />
-        <arg line='--js="${closure-library.dir}/third_party/closure/goog/**.js"' />
-        <arg line="--output_wrapper=@{outputwrapper}" />
-        <arg line="--compilation_level=@{compilationlevel}" />
-        <arg line="--warning_level=VERBOSE" />
-        <arg line="--jscomp_error=accessControls" />
-        <arg line="--jscomp_error=checkDebuggerStatement" />
-        <arg line="--jscomp_error=checkRegExp" />
-        <arg line="--jscomp_error=checkTypes" />
-        <arg line="--jscomp_error=checkVars" />
-        <arg line="--jscomp_error=const" />
-        <arg line="--jscomp_error=constantProperty" />
-        <arg line="--jscomp_error=duplicate" />
-        <arg line="--jscomp_error=duplicateMessage" />
-        <arg line="--jscomp_error=es5Strict" />
-        <arg line="--jscomp_error=externsValidation" />
-        <arg line="--jscomp_error=extraRequire" />
-        <arg line="--jscomp_error=globalThis" />
-        <arg line="--jscomp_error=invalidCasts" />
-        <arg line="--jscomp_error=misplacedTypeAnnotation" />
-        <arg line="--jscomp_error=missingProperties" />
-        <arg line="--jscomp_error=missingRequire" />
-        <arg line="--jscomp_error=nonStandardJsDocs" />
-        <arg line="--jscomp_error=strictModuleDepCheck" />
-        <arg line="--jscomp_error=suspiciousCode" />
-        <arg line="--jscomp_error=typeInvalidation" />
-        <arg line="--jscomp_error=undefinedNames" />
-        <arg line="--jscomp_error=undefinedVars" />
-        <arg line="--jscomp_error=unknownDefines" />
-        <arg line="--jscomp_error=uselessCode" />
-        <arg line="--jscomp_error=visibility" />
-        <extraflags />
+        <arg value="--js" />
+        <arg value="@{inputfile}" />
+        <arg value="--js" />
+        <arg value="i18n/phonenumbers/*.js" />
+        <arg value="--js" />
+        <arg value="!i18n/phonenumbers/metadatafortesting.js" />
+        <arg value="--js" />
+        <arg value="!i18n/phonenumbers/metadatalite.js" />
+        <arg value="--js" />
+        <arg value="!i18n/phonenumbers/regioncodefortesting.js" />
+        <arg value="--js" />
+        <arg value="${closure-library.dir}/closure/goog/**.js" />
+        <arg value="--dependency_mode" />
+        <arg value="PRUNE" />
+        <arg value="--entry_point" />
+        <arg value="@{inputfile}" />
+        <arg value="--js_output_file" />
+        <arg value="@{outputfile}" />
+        <arg value="--output_wrapper" />
+        <arg value="@{outputwrapper}" />
+        <arg value="--compilation_level" />
+        <arg value="@{compilationlevel}" />
+        <arg value="--warning_level" />
+        <arg value="VERBOSE" />
+        <arg value="--process_common_js_modules" />
+        <arg value="--module_resolution" />
+        <arg value="NODE" />
+        <arg value="--define" />
+        <arg value="goog.ENABLE_DEBUG_LOADER=false" />
       </exec>
     </sequential>
   </macrodef>
@@ -88,13 +84,13 @@
   <target name="setnulldevice" depends="nul,devnull" />
 
   <target name="clean" description="deletes all generated files">
-    <delete file="i18n/phonenumbers/demo-compiled.js" />
+    <delete file="lib/compiled.js" />
   </target>
 
-  <target name="compile-demo"
-          description="generates demo-compiled.js">
-    <closure-compile entrypoint="goog:i18n.phonenumbers.demo"
-                     outputfile="i18n/phonenumbers/demo-compiled.js">
+  <target name="compile-lib"
+          description="generates library compiled.js">
+    <closure-compile inputfile="index.js"
+                     outputfile="lib/compiled.js">
       <extraflags>
         <arg line='--js="i18n/phonenumbers/**.js"' />
         <arg line='--js="!i18n/phonenumbers/demo-compiled.js"' />
@@ -135,11 +131,11 @@
     </closure-compile>
   </target>
 
-  <target name="compile" depends="compile-demo,compile-tests" />
+  <target name="compile" depends="compile-lib,compile-tests" />
 
   <target name="lint" description="lints all javascript files">
     <gjslint inputfile="i18n/phonenumbers/asyoutypeformatter*.js" />
-    <gjslint inputfile="i18n/phonenumbers/demo.js" />
+    <gjslint inputfile="index.js" />
     <gjslint inputfile="i18n/phonenumbers/phonenumberutil*.js" />
     <gjslint inputfile="i18n/phonenumbers/shortnumberinfo*.js" />
   </target>
